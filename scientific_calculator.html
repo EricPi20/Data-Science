@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scientific Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .calculator-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+
+        .display {
+            background: #1a1a1a;
+            color: #00ff41;
+            font-size: 2.5em;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: right;
+            margin-bottom: 20px;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            font-family: 'Courier New', monospace;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+
+        button {
+            padding: 20px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .number {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .number:hover {
+            background: #e0e0e0;
+        }
+
+        .operator {
+            background: #ff9500;
+            color: white;
+        }
+
+        .operator:hover {
+            background: #ff8500;
+        }
+
+        .function {
+            background: #4a90e2;
+            color: white;
+            font-size: 0.9em;
+        }
+
+        .function:hover {
+            background: #357abd;
+        }
+
+        .equals {
+            background: #34c759;
+            color: white;
+            grid-column: span 2;
+        }
+
+        .equals:hover {
+            background: #30b04f;
+        }
+
+        .clear {
+            background: #ff3b30;
+            color: white;
+        }
+
+        .clear:hover {
+            background: #e02e24;
+        }
+
+        .memory {
+            background: #8e8e93;
+            color: white;
+            font-size: 0.9em;
+        }
+
+        .memory:hover {
+            background: #6e6e73;
+        }
+
+        .zero {
+            grid-column: span 2;
+        }
+
+        .expression {
+            font-size: 0.6em;
+            color: #888;
+            margin-bottom: 5px;
+            min-height: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator-container">
+        <h1>⚓ Scientific Calculator</h1>
+        <div class="display">
+            <div>
+                <div class="expression" id="expression"></div>
+                <div id="display">0</div>
+            </div>
+        </div>
+        <div class="buttons">
+            <!-- Row 1: Memory and Clear -->
+            <button class="memory" onclick="memoryClear()">MC</button>
+            <button class="memory" onclick="memoryRecall()">MR</button>
+            <button class="memory" onclick="memoryAdd()">M+</button>
+            <button class="memory" onclick="memorySubtract()">M-</button>
+            <button class="clear" onclick="clearAll()">C</button>
+
+            <!-- Row 2: Functions -->
+            <button class="function" onclick="appendFunction('sin(')">sin</button>
+            <button class="function" onclick="appendFunction('cos(')">cos</button>
+            <button class="function" onclick="appendFunction('tan(')">tan</button>
+            <button class="function" onclick="appendFunction('log(')">log</button>
+            <button class="function" onclick="appendFunction('ln(')">ln</button>
+
+            <!-- Row 3: More Functions -->
+            <button class="function" onclick="appendFunction('asin(')">asin</button>
+            <button class="function" onclick="appendFunction('acos(')">acos</button>
+            <button class="function" onclick="appendFunction('atan(')">atan</button>
+            <button class="function" onclick="appendPower('^')">x^y</button>
+            <button class="function" onclick="appendFunction('sqrt(')">√</button>
+
+            <!-- Row 4: Numbers and Operators -->
+            <button class="function" onclick="appendFunction('exp(')">e^x</button>
+            <button class="operator" onclick="appendOperator('(')">(</button>
+            <button class="operator" onclick="appendOperator(')')">)</button>
+            <button class="operator" onclick="appendOperator('/')">/</button>
+            <button class="clear" onclick="clearEntry()">CE</button>
+
+            <!-- Row 5: Numbers -->
+            <button class="number" onclick="appendNumber('7')">7</button>
+            <button class="number" onclick="appendNumber('8')">8</button>
+            <button class="number" onclick="appendNumber('9')">9</button>
+            <button class="operator" onclick="appendOperator('*')">×</button>
+            <button class="function" onclick="appendConstant('Math.PI')">π</button>
+
+            <!-- Row 6: Numbers -->
+            <button class="number" onclick="appendNumber('4')">4</button>
+            <button class="number" onclick="appendNumber('5')">5</button>
+            <button class="number" onclick="appendNumber('6')">6</button>
+            <button class="operator" onclick="appendOperator('-')">-</button>
+            <button class="function" onclick="appendConstant('Math.E')">e</button>
+
+            <!-- Row 7: Numbers -->
+            <button class="number" onclick="appendNumber('1')">1</button>
+            <button class="number" onclick="appendNumber('2')">2</button>
+            <button class="number" onclick="appendNumber('3')">3</button>
+            <button class="operator" onclick="appendOperator('+')">+</button>
+            <button class="function" onclick="factorial()">n!</button>
+
+            <!-- Row 8: Zero and Decimal -->
+            <button class="number zero" onclick="appendNumber('0')">0</button>
+            <button class="number" onclick="appendDecimal()">.</button>
+            <button class="operator" onclick="appendOperator('%')">%</button>
+            <button class="equals" onclick="calculate()">=</button>
+        </div>
+    </div>
+
+    <script>
+        let display = document.getElementById('display');
+        let expression = document.getElementById('expression');
+        let currentInput = '0';
+        let memory = 0;
+        let lastResult = null;
+
+        function updateDisplay() {
+            display.textContent = currentInput;
+            expression.textContent = '';
+        }
+
+        function appendNumber(num) {
+            if (currentInput === '0' || currentInput === 'Error') {
+                currentInput = num;
+            } else {
+                currentInput += num;
+            }
+            updateDisplay();
+        }
+
+        function appendDecimal() {
+            if (currentInput === 'Error') {
+                currentInput = '0.';
+            } else if (!currentInput.includes('.')) {
+                currentInput += '.';
+            }
+            updateDisplay();
+        }
+
+        function appendOperator(op) {
+            if (currentInput === 'Error') {
+                currentInput = '0';
+            }
+            // Replace last operator if one exists
+            if (['+', '-', '*', '/', '%', '^'].includes(currentInput.slice(-1))) {
+                currentInput = currentInput.slice(0, -1) + op;
+            } else {
+                currentInput += op;
+            }
+            updateDisplay();
+        }
+
+        function appendFunction(func) {
+            if (currentInput === '0' || currentInput === 'Error') {
+                currentInput = func;
+            } else {
+                // Check if we need to add multiplication
+                const lastChar = currentInput.slice(-1);
+                if (!['+', '-', '*', '/', '%', '^', '(', '.'].includes(lastChar) && lastChar !== '') {
+                    currentInput += '*' + func;
+                } else {
+                    currentInput += func;
+                }
+            }
+            updateDisplay();
+        }
+
+        function appendPower(op) {
+            appendOperator('^');
+        }
+
+        function appendConstant(constant) {
+            let value;
+            if (constant === 'Math.PI') {
+                value = Math.PI.toString();
+            } else if (constant === 'Math.E') {
+                value = Math.E.toString();
+            }
+
+            if (currentInput === '0' || currentInput === 'Error') {
+                currentInput = value;
+            } else {
+                const lastChar = currentInput.slice(-1);
+                if (!['+', '-', '*', '/', '%', '^', '(', '.'].includes(lastChar) && lastChar !== '') {
+                    currentInput += '*' + value;
+                } else {
+                    currentInput += value;
+                }
+            }
+            updateDisplay();
+        }
+
+        function factorial() {
+            try {
+                let num = parseFloat(currentInput);
+                if (num < 0 || !Number.isInteger(num)) {
+                    currentInput = 'Error';
+                    updateDisplay();
+                    return;
+                }
+                let result = 1;
+                for (let i = 2; i <= num; i++) {
+                    result *= i;
+                }
+                currentInput = result.toString();
+                updateDisplay();
+            } catch (e) {
+                currentInput = 'Error';
+                updateDisplay();
+            }
+        }
+
+        function calculate() {
+            try {
+                expression.textContent = currentInput;
+                
+                // Replace function names with Math functions
+                let expressionToEval = currentInput
+                    .replace(/sin\(/g, 'Math.sin(')
+                    .replace(/cos\(/g, 'Math.cos(')
+                    .replace(/tan\(/g, 'Math.tan(')
+                    .replace(/asin\(/g, 'Math.asin(')
+                    .replace(/acos\(/g, 'Math.acos(')
+                    .replace(/atan\(/g, 'Math.atan(')
+                    .replace(/log\(/g, 'Math.log10(')
+                    .replace(/ln\(/g, 'Math.log(')
+                    .replace(/exp\(/g, 'Math.exp(')
+                    .replace(/sqrt\(/g, 'Math.sqrt(')
+                    .replace(/\^/g, '**')
+                    .replace(/%/g, '/100');
+
+                // Evaluate the expression
+                let result = Function('"use strict"; return (' + expressionToEval + ')')();
+                
+                // Handle very large or very small numbers
+                if (Math.abs(result) > 1e15 || (Math.abs(result) < 1e-10 && result !== 0)) {
+                    currentInput = result.toExponential(6);
+                } else {
+                    // Round to avoid floating point errors
+                    result = Math.round(result * 1e10) / 1e10;
+                    currentInput = result.toString();
+                }
+                
+                lastResult = result;
+                updateDisplay();
+            } catch (e) {
+                currentInput = 'Error';
+                updateDisplay();
+            }
+        }
+
+        function clearAll() {
+            currentInput = '0';
+            expression.textContent = '';
+            updateDisplay();
+        }
+
+        function clearEntry() {
+            currentInput = '0';
+            updateDisplay();
+        }
+
+        function memoryClear() {
+            memory = 0;
+        }
+
+        function memoryRecall() {
+            currentInput = memory.toString();
+            updateDisplay();
+        }
+
+        function memoryAdd() {
+            try {
+                let value = parseFloat(currentInput);
+                if (!isNaN(value)) {
+                    memory += value;
+                }
+            } catch (e) {
+                // Ignore errors
+            }
+        }
+
+        function memorySubtract() {
+            try {
+                let value = parseFloat(currentInput);
+                if (!isNaN(value)) {
+                    memory -= value;
+                }
+            } catch (e) {
+                // Ignore errors
+            }
+        }
+
+        // Keyboard support
+        document.addEventListener('keydown', function(event) {
+            const key = event.key;
+            
+            if (key >= '0' && key <= '9') {
+                appendNumber(key);
+            } else if (key === '.') {
+                appendDecimal();
+            } else if (['+', '-', '*', '/'].includes(key)) {
+                appendOperator(key);
+            } else if (key === 'Enter' || key === '=') {
+                event.preventDefault();
+                calculate();
+            } else if (key === 'Escape' || key === 'c' || key === 'C') {
+                clearAll();
+            } else if (key === 'Backspace') {
+                if (currentInput.length > 1) {
+                    currentInput = currentInput.slice(0, -1);
+                } else {
+                    currentInput = '0';
+                }
+                updateDisplay();
+            } else if (key === '(') {
+                appendOperator('(');
+            } else if (key === ')') {
+                appendOperator(')');
+            }
+        });
+
+        // Initialize display
+        updateDisplay();
+    </script>
+</body>
+</html>
